@@ -1,0 +1,11 @@
+foreach:
+https://www.rstudio.com/resources/rstudioconf-2020/parallel-computing-with-r-using-foreach-future-and-other-packages/
+
+future:
+https://www.rstudio.com/resources/rstudioconf-2020/future-simple-async-parallel-distributed-processing-in-r-what-s-next/
+
+https://www.futureverse.org/talks.html
+
+load balance
+
+memory consumption of fork
