@@ -246,36 +246,6 @@ timewarningfirst=25, colorwarningfirst=yellow, fillcolorwarningfirst=SteelBlue!8
 \tableofcontents
 \end{frame}
 
-\section{R with C/C++}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}[fragile]
-  \frametitle{Extention of Rcpp}
-  \begin{block}{RcppProgress}
-    \begin{itemize}
-    \item \href{https://gallery.rcpp.org/articles/using-rcppprogress/}{Article: Using RcppProgress to control the long computations in C++}
-    \end{itemize}
-\begin{minted}{r}
-# Rcpp::sourceCpp("rcpp_progress.cpp")
-# long_computation(3000)
-# 0%   10   20   30   40   50   60   70   80   90   100%
-# [----|----|----|----|----|----|----|----|----|----|
-# **************************************************|
-# [1] 3002.32
-\end{minted}
-  \end{block}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Extention of Rcpp}
-  \begin{block}{RcppParallel}
-    \begin{figure}[htbp]
-    \centering
-    \includegraphics[width = \textwidth]{rcpp_parallel}
-  \end{figure}
-  \end{block}
-\end{frame}
-
 \section{Parallel Computation in R}
 
 \subsection{Introduction}
@@ -383,7 +353,7 @@ res <- sum(res_par)
 \subsection{Advanced topics}
 
 \begin{frame}[fragile]
-  \frametitle{PSOCK vs FORK}
+  \frametitle{Rabbit hole 1: PSOCK vs FORK}
 \begin{minted}{r}
 a <- rnorm(100)
 \end{minted}
@@ -405,7 +375,43 @@ parSapply(cls, 1 : 10, function(id){
 \end{frame}
 
 \begin{frame}
-  \frametitle{PSOCK vs FORK}
+  \frametitle{Rabbit hole 1: PSOCK vs FORK}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width = \textwidth]{psock_remote}
+    \caption{PSOCK connects to remote server}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rabbit hole 1: PSOCK vs FORK}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width = \textwidth]{psock_remote_future}
+    \caption{PSOCK (via future/parallely) connects to remote server}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rabbit hole 1: PSOCK vs FORK}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width = \textwidth]{fork_start}
+    \caption{Memory consumption of FORK, part 1}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rabbit hole 1: PSOCK vs FORK}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width = \textwidth]{fork_transport}
+    \caption{Memory consumption of FORK, part 2}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rabbit hole 1: PSOCK vs FORK}
   \begin{block}{PSOCK}
     \begin{itemize}
     \item Pros:
@@ -428,10 +434,26 @@ parSapply(cls, 1 : 10, function(id){
   \end{block}
 \end{frame}
 
+
 \begin{frame}
-  \frametitle{Parallel random number generation}
+  \frametitle{Rabbit hole 2: Parallel random number generation}
+  \begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[h]{0.45\textwidth}
+      \includegraphics[width = \textwidth]{RNG_psock}
+      \caption{No control on PSOCK}
+    \end{subfigure}
+        \begin{subfigure}[h]{0.45\textwidth}
+      \includegraphics[width = \textwidth]{RNG_fork}
+      \caption{Same seed on FORK}
+    \end{subfigure}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rabbit hole 2: Parallel random number generation}
   \begin{itemize}
-  \item Manually use \mintinline{r}{set.seed()} on every worker.
+  \item Manually use \mintinline{r}{set.seed()} on every worker. {\color{brown} not recommended}
   \item Use 'L’Ecuyer-CMRG' multiple RNG stream.
     \begin{enumerate}
     \item \mintinline{r}{RNGkind("L'Ecuyer-CMRG")} on your main session.
@@ -442,7 +464,7 @@ parSapply(cls, 1 : 10, function(id){
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Variable transportation}
+  \frametitle{Rabbit hole 3: Variable transportation}
   \begin{itemize}
   \item Explicit functions and variables will always be transported.
   \item FORK will copy the main session at creation.
@@ -453,7 +475,7 @@ parSapply(cls, 1 : 10, function(id){
 
 \subsection{Easy parallel computation}
 \begin{frame}
-  \frametitle{Dark time of parallel computation}
+  \frametitle{How many frameworks can one developer maintains?}
   There are so many different parallel backends:
   \begin{itemize}
   \item snow
@@ -478,7 +500,7 @@ parSapply(cls, 1 : 10, function(id){
   \begin{block}{End user}
     Decide {\color{Brown}how} to run in parallel based on their available resources.
   \end{block}
-  \mintinline{r}{foreach} is syntactically structured in the form of a for loop.
+  \mintinline{r}{foreach} is syntactically structured in the form of a for loop. But actually it works like {\color{red}-apply} functions.
 \end{frame}
 
 \begin{frame}[fragile]
@@ -492,6 +514,7 @@ foreach(i = 1 : 12, j = 12 : 1, .combine = rbind) %dopar%{
     Sys.sleep(0.5)
     # print will be dropped when run in parallel
     print(paste("i = ", i, ", j = ", j, sep = ""))
+    # 'a' is passed automatically
     data.frame(i, j, a)
 }
 \end{minted}
@@ -600,9 +623,34 @@ with_progress(y <- slow_sum(1:10))
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Profile the future}
+  \frametitle{Profile parallel code (WIP)}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 0.6\textwidth]{profile_future}
+    \caption{Profile parallel code}
+  \end{figure}
+  Figure source at https://www.jottr.org/2022/06/23/future-user2022-slides/
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{Profile parallel code (WIP)}
+  \begin{minted}{r}
+remotes::install_github(
+    "git@github.com:HenrikBengtsson/future.git", 
+    ref = "9875992", force = TRUE)
+\end{minted}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 0.5\textwidth]{future_journal}
+    \caption{Profile parallel code}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Parallel is not the only way}
+  How about we use $\frac{(1 + n) \times n}{2}$ ?
+\end{frame}
 
 
 
