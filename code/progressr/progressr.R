@@ -10,9 +10,18 @@ slow_sum <- function(x) {
     sum
 }
 handlers("default")
-with_progress(y <- slow_sum(1:10))
+y <- slow_sum(1 : 5)    # I don't want progress
+with_progress(y <- slow_sum(1 : 5))    # I want progress report
+
 handlers("progress")
+with_progress(y <- slow_sum(1 : 10))
+
+handlers("rstudio")
 with_progress(y <- slow_sum(1:10))
+
+handlers("progress")
+handlers(global = TRUE)    # available for R >= 4.0, always repsenting progress
+y <- slow_sum(1 : 5)
 
 # ------ work with normal output ------
 slow_sum <- function(x) {
@@ -26,7 +35,7 @@ slow_sum <- function(x) {
     }
     sum
 }
-with_progress(y <- slow_sum(1:10))
+y <- slow_sum(1 : 5)
 
 # ------ supports parallel processing ------
 # --- future.apply ---
@@ -83,10 +92,10 @@ outside_fun <- function(idvec_mat){
     NULL
 }
 
-handlers("progress")
+# handlers("progress")
 
 inside_fun(1 : 10)
-with_progress(inside_fun(1 : 10))
 
-with_progress(outside_fun(matrix(1 : 30, nrow = 3, byrow = T)))    # currently only the first layer of progress is reported
-
+outside_fun(matrix(1 : 30, nrow = 3, byrow = T))    # currently only the first layer of progress is reported
+# at last will be a progress from `inside_fun`
+#   that's because progress report from `outside_fun` finishes, then a call to `inside_fun`

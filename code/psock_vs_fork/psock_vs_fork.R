@@ -16,6 +16,35 @@ parSapply(cls, 1 : 10, function(id){
 stopCluster(cls)
 rm(cls)
 
+# PSOCK can connect to remote machine
+cls <- makeCluster(spec = rep("192.168.0.131", 2),    # ip of remote
+                   type = "PSOCK", 
+                   master = "192.168.0.114",    # ip of local machine
+                   user = "lovby", 
+                   rscript = "/usr/bin/Rscript", 
+                   manual = FALSE, 
+                   homogeneous = TRUE, 
+                   setup_strategy = "parallel", 
+                   outfile = "")
+
+cls <- future::makeClusterPSOCK(
+    workers = rep("192.168.0.131", 4), 
+    user = "lovby",
+    rscript = "/usr/bin/Rscript", 
+    verbose = TRUE, 
+    outfile = "")
+
+res <- parSapply(cls, 1 : 10, function(id){
+    x <- matrix(rnorm(10 ^ 6), nrow = 10 ^ 3)
+    for(i in 1 : 2){
+        print(paste("i = ", i))
+        res <- eigen(x) 
+    }
+    return(res)
+})
+stopCluster(cls)
+rm(cls)
+
 # ------ FORK ------
 cls <- makeCluster(4, type = "FORK")
 parSapply(cls, 1 : 10, function(id){
@@ -25,7 +54,7 @@ stopCluster(cls)
 rm(cls)
 
 # ------ memory useage of FORK ------
-a <- rnorm(1 * 10 ^ 8)
+a <- rnorm(4 * 10 ^ 8)
 gc()
 a[1 : 10]
 

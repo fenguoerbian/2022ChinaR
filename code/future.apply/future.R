@@ -36,3 +36,23 @@ resolved(x)
 # [1] TRUE
 y <- value(x)
 plan(sequential)
+
+
+# WIP, journal system
+
+remotes::install_github("git@github.com:HenrikBengtsson/future.git", ref = "9875992", force = TRUE)
+
+library(future)
+
+?capture_journals()
+plan(cluster, workers = 2)
+slow_fcn <- function(x) {
+    Sys.sleep(x / 10)
+    sqrt(x)
+}
+
+js <- capture_journals({
+    fs <- lapply(3:1, FUN = function(x) future(slow_fcn(x)))
+    value(fs)
+})
+lapply(js, function(indata){indata[1 : 6, c("event", "type", "parent", "duration")]})

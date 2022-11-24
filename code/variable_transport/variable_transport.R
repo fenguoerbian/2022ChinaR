@@ -23,6 +23,7 @@ fun3 <- function(invec){
     res <- fun1(invec = invec)
     return(res)
 }
+
 parSapply(cls, id_seq, fun3)    # could not find fun1 at worker nodes
 clusterEvalQ(cls, ls())
 clusterExport(cls, varlist = "fun1")    # pass fun1 to workers

@@ -14,6 +14,10 @@ foreach(i = 1 : 12, j = 12 : 1, .combine = rbind) %dopar%{
     data.frame(i, j, a)
 } 
 
+foreach(i = 1 : 8, .combine = c) %dopar% {
+    ls()
+}
+
 system.time(
     foreach(i = 1 : 12, j = 12 : 1, .combine = rbind) %dopar%{
         Sys.sleep(0.5)
@@ -40,6 +44,7 @@ foreach(i = 1 : 12, j = 12 : 1, .combine = rbind) %dopar%{
     print(paste("i = ", i, ", j = ", j, sep = ""))    # output is relayed back with future backend
     data.frame(i, j, a)
 } 
+
 
 
 library(doRNG)

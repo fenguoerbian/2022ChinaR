@@ -23,7 +23,7 @@ tmp <- function(n){
 tmp(n)
 
 
-plan(cluster)
+plan(cluster)    # a parallel plan
 lapply(1 : 5, function(id){
     print(paste("id = ", id, sep = ""))
     Sys.sleep(0.5)
@@ -37,3 +37,13 @@ future_lapply(1 : 5, function(id){
 })
 tmp(n)
 
+# ------ RNG ------
+future_sapply(1 : 5, rnorm)    # `future` detects RNG
+
+future_sapply(1 : 5, rnorm, future.seed = TRUE)
+
+future_sapply(1 : 5, rnorm, future.seed = TRUE)
+
+future_sapply(1 : 5, rnorm, future.seed = 10)
+
+future_sapply(1 : 5, rnorm, future.seed = 10)
