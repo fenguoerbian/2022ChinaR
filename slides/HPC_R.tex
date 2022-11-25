@@ -521,35 +521,13 @@ foreach(i = 1 : 12, j = 12 : 1, .combine = rbind) %dopar%{
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{future and future.apply}
-  \begin{itemize}
-  \item \mintinline{r}{future} provides a simple and uniform way of evaluating R expressions asynchronously using various resources available to the user.
-  \item \mintinline{r}{future.apply} provides worry-free parallel alternatives to base-R "apply" functions.
-  \end{itemize}
-\begin{minted}{r}
-library(future.apply)    # default plan is sequential
-# plan(cluster)
-x <- rnorm(16)
-future_lapply(1 : 5, function(id){
-    print(paste("id = ", id, sep = ""))    # normal print kept
-    Sys.sleep(0.5)
-    sum(x[1 : id])
-})
-\end{minted}
-\end{frame}
-
-\begin{frame}[fragile]
   \frametitle{future}
   \begin{itemize}
+  \item \mintinline{r}{future} provides a simple and uniform way of evaluating R expressions asynchronously using various resources available to the user.
   \item Asynchronous computation. Not constrained by a for-loop or apply syntax.
-  \item Available extensions:
-    \begin{itemize}
-    \item \mintinline{r}{future.apply}
-    \item \mintinline{r}{doFuture}: backends for \mintinline{r}{foreach}, \mintinline{r}{BiocParallel} and \mintinline{r}{plyr}.
-    \item \mintinline{r}{furrr}
     \end{itemize}
-  \end{itemize}
-\end{frame}
+  \end{frame}
+
 
 \begin{frame}[fragile]
   \frametitle{future}
@@ -568,6 +546,33 @@ x <- future({
 
 resolved(x)    # check whether the future is resolved
 a <- rnorm(10)    # we can do other stuff at the main session
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Futureverse}
+  % https://www.futureverse.org/
+  \par
+  Available extensions for map-reduce:
+    \begin{itemize}
+    \item \mintinline{r}{future.apply}
+    \item \mintinline{r}{doFuture}: backends for \mintinline{r}{foreach}, \mintinline{r}{BiocParallel} and \mintinline{r}{plyr}.
+    \item \mintinline{r}{furrr}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Futureverse - future.apply}
+\mintinline{r}{future.apply} provides worry-free parallel alternatives to base-R "apply" functions.
+\begin{minted}{r}
+library(future.apply)    # default plan is sequential
+# plan(cluster)
+x <- rnorm(16)
+future_lapply(1 : 5, function(id){
+    print(paste("id = ", id, sep = ""))    # normal print kept
+    Sys.sleep(0.5)
+    sum(x[1 : id])
+})
 \end{minted}
 \end{frame}
 
@@ -646,7 +651,7 @@ remotes::install_github(
   \end{figure}
 \end{frame}
 
-\begin{frame}[fragile,fragile]
+\begin{frame}[fragile]
   \frametitle{Profile parallel code (WIP)}
 \begin{minted}{r}
 library(future)

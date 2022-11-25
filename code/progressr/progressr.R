@@ -77,7 +77,7 @@ inside_fun <- function(idvec){
     pb <- progressr::progressor(along = idvec)
     for(id in idvec){
         pb(message = paste("current ID = ", id, sep = ""))
-        Sys.sleep(0.5)
+        Sys.sleep(0.25)
     }
     return(idvec)
 }
@@ -86,7 +86,7 @@ outside_fun <- function(idvec_mat){
     pb2 <- progressr::progressor(along = 1 : nrow(idvec_mat))
     for(id in 1 : nrow(idvec_mat)){
         pb2(message = paste("List ID = ", id, sep = ""))
-        Sys.sleep(2)
+        Sys.sleep(1)
         inside_fun(idvec_mat[id, ])
     }
     NULL

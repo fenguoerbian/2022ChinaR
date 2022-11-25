@@ -35,6 +35,7 @@ future_lapply(1 : 5, function(id){
     Sys.sleep(0.5)
     sum(x[1 : id])
 })
+
 tmp(n)
 
 # ------ RNG ------
@@ -47,3 +48,5 @@ future_sapply(1 : 5, rnorm, future.seed = TRUE)
 future_sapply(1 : 5, rnorm, future.seed = 10)
 
 future_sapply(1 : 5, rnorm, future.seed = 10)
+
+plan(sequential)

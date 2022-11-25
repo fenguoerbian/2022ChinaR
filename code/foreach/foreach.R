@@ -6,12 +6,12 @@ foreach(i = 1 : 12, j = 12 : 1, .combine = rbind) %dopar%{
     data.frame(i, j, a)
 }
 
-library(doParallel)
-registerDoParallel()
+
+doParallel::registerDoParallel()
 foreach(i = 1 : 12, j = 12 : 1, .combine = rbind) %dopar%{
     Sys.sleep(0.5)
     print(paste("i = ", i, ", j = ", j, sep = ""))    # where is my output?
-    data.frame(i, j, a)
+    data.frame(i, j, a)    # a is transported AUTOMATICALLY!
 } 
 
 foreach(i = 1 : 8, .combine = c) %dopar% {
@@ -36,8 +36,7 @@ foreach(i = 1 : 4, .combine = `+`) %dopar%{
 # so `<<-` will not work.
 
 
-library(doFuture)
-registerDoFuture()
+doFuture::registerDoFuture()
 plan(cluster)
 foreach(i = 1 : 12, j = 12 : 1, .combine = rbind) %dopar%{
     Sys.sleep(0.5)
@@ -48,8 +47,20 @@ foreach(i = 1 : 12, j = 12 : 1, .combine = rbind) %dopar%{
 
 
 library(doRNG)
-registerDoParallel()
 
+doParallel::registerDoParallel()
+
+set.seed(1234)
+rnorm(2)
+set.seed(1234)
+(s1 <- foreach(i=1:4) %dopar% { runif(1) })
+set.seed(1234)
+(s2 <- foreach(i=1:4) %dopar% { runif(1) })
+identical(s1, s2)
+
+# future will warn you about unsafe RNG
+doFuture::registerDoFuture()
+plan(cluster)
 set.seed(1234)
 rnorm(2)
 set.seed(1234)
@@ -63,12 +74,4 @@ identical(s1, s2)
 (r2 <- foreach(i=1:4, .options.RNG=1234) %dorng% { runif(2) })
 identical(r1, r2)
 
-registerDoFuture()
-plan(cluster)
-set.seed(1234)
-rnorm(2)
-set.seed(1234)
-(s1 <- foreach(i=1:4) %dopar% { runif(1) })
-set.seed(1234)
-(s2 <- foreach(i=1:4) %dopar% { runif(1) })
-identical(s1, s2)
+
