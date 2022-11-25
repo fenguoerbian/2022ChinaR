@@ -646,9 +646,52 @@ remotes::install_github(
   \end{figure}
 \end{frame}
 
+\begin{frame}[fragile,fragile]
+  \frametitle{Profile parallel code (WIP)}
+\begin{minted}{r}
+library(future)
+n_worker <- 3
+n <- 6
+
+plan(cluster, workers = n_worker)
+slow <- function(x){
+    Sys.sleep(x / 5)
+    return(x)
+}
+
+tmp <- capture_journals({
+    fs <- lapply(1 : n, function(x) future(slow(x)))
+    vs <- value(fs)  
+})
+\end{minted}
+\end{frame}
 
 \begin{frame}
-  \frametitle{Parallel is not the only way}
+  \frametitle{Profile parallel code (WIP)}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 0.9\textwidth]{fig_type}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Profile parallel code (WIP)}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 0.9\textwidth]{fig_event}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Profile parallel code (WIP)}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 0.9\textwidth]{fig_event2}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Parallel is NOT all you need}
   How about we use $\frac{(1 + n) \times n}{2}$ ?
 \end{frame}
 
